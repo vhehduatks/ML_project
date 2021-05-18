@@ -17,13 +17,14 @@ Point = namedtuple('Point', 'x, y')
 
 # rgb colors
 WHITE = (255, 255, 255)
+GRAY = (20,20,20)
 RED = (200,0,0)
-BLUE1 = (0, 0, 255)
+GREEN = (51, 204, 51)
 BLUE2 = (0, 100, 255)
 BLACK = (0,0,0)
 
-BLOCK_SIZE = 10
-SPEED = 20
+BLOCK_SIZE = 20
+SPEED = 10
 
 class SnakeGame:
     
@@ -55,7 +56,6 @@ class SnakeGame:
             self._place_food()#새롭게 먹이를 재공
         
     def play_step(self):
-        # 1. collect user input
         for event in pygame.event.get(): #이벤트처리(방향)
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -102,13 +102,18 @@ class SnakeGame:
             return True #헤드가 몸통의 좌표를 지나가는경우
         
         return False
-        
+
+    def _drawGrid(self):
+        for x in range(0, self.w, BLOCK_SIZE):
+            for y in range(0, self.h, BLOCK_SIZE):
+                rect = pygame.Rect(x, y, BLOCK_SIZE, BLOCK_SIZE)
+                pygame.draw.rect(self.display, GRAY, rect, 1)
+
     def _update_ui(self):
         self.display.fill(BLACK)
-        
+        self._drawGrid()
         for pt in self.snake:
-            pygame.draw.rect(self.display, BLUE1, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
-            # pygame.draw.rect(self.display, BLUE2, pygame.Rect(pt.x+4, pt.y+4, 12, 12))
+            pygame.draw.rect(self.display, GREEN, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
             
         pygame.draw.rect(self.display, RED, pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE))
         
