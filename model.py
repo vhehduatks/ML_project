@@ -5,14 +5,14 @@ import torch.nn.functional as F
 import os
 
 class Linear_QNet(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size):
+    def __init__(self):
         super().__init__()
-        self.linear1 = nn.Linear(input_size, hidden_size)
-        self.linear2 = nn.Linear(hidden_size, output_size)
-
+        self.linear_hidden = nn.Linear(11, 400) #10=5,400=55,600=60
+        self.hidden_out = nn.Linear(400, 3)
+        
     def forward(self, x):
-        x = F.relu(self.linear1(x))
-        x = self.linear2(x)
+        x = F.relu(self.linear_hidden(x))
+        x = self.hidden_out(x)
         return x
 
     def save(self, file_name='model.pth'):
@@ -22,8 +22,7 @@ class Linear_QNet(nn.Module):
 
         file_name = os.path.join(model_folder_path, file_name)
         torch.save(self.state_dict(), file_name)
-
-
+        
 class QTrainer:
     def __init__(self, model, lr, gamma):
         self.lr = lr
@@ -56,16 +55,18 @@ class QTrainer:
             if not done[idx]:
                 Q_new = reward[idx] + self.gamma * torch.max(self.model(next_state[idx]))
 
+            #argmax=텐서 안의 최대값의 인덱스가 반환됨
             target[idx][torch.argmax(action[idx]).item()] = Q_new
     
         # 2: Q_new = r + y * max(next_predicted Q value) -> only do this if not done
         # pred.clone()
         # preds[argmax(action)] = Q_new
-        self.optimizer.zero_grad()
-        loss = self.criterion(target, pred)
-        loss.backward()
 
-        self.optimizer.step()
+        #가중치를 갱신
+        self.optimizer.zero_grad()#변화도 버퍼를 0으로 설정
+        loss = self.criterion(target, pred)#손실함수로 loss측정
+        loss.backward()#역전파
+        self.optimizer.step()#네트워크 업데이트
 
 
 
