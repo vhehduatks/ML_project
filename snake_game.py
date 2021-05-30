@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 import pygame
 import random
 from enum import Enum
@@ -25,7 +24,7 @@ GREEN = (51, 204, 51)
 BLACK = (0,0,0)
 
 BLOCK_SIZE = 20
-SPEED = 60
+SPEED = 0
 
 class SnakeGame:
     
@@ -69,18 +68,15 @@ class SnakeGame:
                 pygame.quit()
                 quit()
         
-        # 2. move
         self._move(action) # update the head = 헤드의 좌표를 키입력 이벤트에 따라서 바꾼다.
         self.snake.insert(0, self.head)# 바뀐 헤드(snake의 첫번째 item)를 snake에 업데이트한다. =헤드가 추가됨
         
-        # 3. check if game over
         game_over = False
         if self.is_collision() or (self.game_frame-self.last_eat_frame) > 200: # 게임오버일 케이스(is_collision 이거나 뱀이 먹이를 안먹고 돌아다니는 경우)
             game_over = True # 게임오버시키고
             reward-=10
             return reward,game_over, self.score #스코어 리턴
             
-        # 4. place new food or just move
         if self.head == self.food: #먹이를 먹었을 경우
             self.last_eat_frame=self.game_frame
             reward+=10
